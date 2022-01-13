@@ -1,0 +1,60 @@
+Salesforce Report replacement for AppnexusAdvertiser - https://m32media.my.salesforce.com/00O2M000008kq82
+
+View Definition created under Reference_SF dataset named VW_AppnexusAdvertiser_AP ( Name will be updated in near future)
+
+
+SELECT
+  Name AS Account_Name,
+  AccountId AS Account_Id,
+  PublisherParentName AS Parent_Account,
+  PublisherParentId AS Parent_Account_ID,
+  "Sales" AS Account_Record_Type,
+  CASE
+    WHEN AppNexusId IS NULL THEN '-'
+  ELSE
+  AppNexusId
+END
+  AS APNX_ID_2437
+FROM (
+  SELECT
+    Publisher.AccountId,
+    Publisher.Name,
+    Publisher.ParentId,
+    Publisher.APNX_ID_2437 AS AppNexusId,
+    RecordTypeId,
+    Account_Status__c,
+    CASE
+      WHEN ParentAccountId IS NULL THEN Publisher.AccountId
+    ELSE
+    ParentAccountId
+  END
+    AS PublisherParentId,
+    CASE
+      WHEN ParentAccountName IS NULL THEN Publisher.Name
+    ELSE
+    ParentAccountName
+  END
+    AS PublisherParentName
+  FROM (
+    SELECT
+      AccountId,
+      Name,
+      ParentId,
+      APNX_ID_2437__c AS APNX_ID_2437,
+      RecordTypeId,
+      Account_Status__c
+    FROM
+      `adoperationsprd3.Reference_SF.Account` )AS Publisher
+  LEFT JOIN (
+    SELECT
+      AccountId AS ParentAccountId,
+      Name AS ParentAccountName
+    FROM
+      `adoperationsprd3.Reference_SF.Account` ) AS Parent
+  ON
+    Parent.ParentAccountId = Publisher.ParentId )
+WHERE
+  Account_Status__c = 'Active'
+  AND ParentId IS NOT NULL
+  AND RecordTypeId = "01241000000S444AAC"
+
