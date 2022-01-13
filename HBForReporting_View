@@ -1,0 +1,55 @@
+Salesforce Report replacement for HBForreporting - https://m32media.my.salesforce.com/00O2M000009MuMz
+
+View Definition created under Reference_SF dataset named VW_HBForReporting
+
+
+SELECT
+  Site.Name AS Site_Name,
+  Site.Name__c AS Site_Property_Name,
+  Site.Domains__c AS Main_Domain,
+  HBplacement.Name AS HB_Placement_Name,
+  HBplacement.Platform__c AS Platform,
+  HBplacement.Size__c AS Size,
+  HBplacement.Placement_ID__c AS Placement_ID,
+  HBplacement.Owner__c AS Platform_Owner,
+  HBplacement.LastModifiedDate AS Last_Modified_Date,
+  HBplacement.SystemModstamp AS Last_Modified_Date_12,
+  Site.Base_Domain__c AS Base_Domain,
+  HBplacement.Placement_Name__c AS Placement_Name,
+  HBplacement.Second_Placement_ID__c AS Second_Placement_ID,
+  HBplacement.Group_ID__c AS Third_Placement_ID,
+  
+FROM (
+  SELECT
+    SiteId,
+    Site_Status__c,
+    Name,
+    Name__c,
+    AMP_Available__c,
+    Domains__c,
+    Base_Domain__c,
+    Active__c
+  FROM
+    `adoperationsprd3.Reference_SF.Site`
+  WHERE
+    Active__c = TRUE ) AS Site
+JOIN (
+  SELECT
+    Name,
+    Platform__c,
+    Site__c,
+    Size__c,
+    Device__c,
+    Placement_ID__c,
+    Owner__c,
+    LastModifiedDate,
+    SystemModstamp,
+    Placement_Name__c,
+    Second_Placement_ID__c,
+    Group_ID__c
+  FROM
+    `adoperationsprd3.Reference_SF.HB_Placement`
+  WHERE
+    (Device__c != 'AMP'OR Device__c IS NULL ) ) AS HBplacement
+ON
+  Site.SiteId=HBplacement.Site__c
