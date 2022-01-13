@@ -1,0 +1,14 @@
+Salesforce Report replacement for SF_Teams - https://m32media.my.salesforce.com/00O2M000008YDlF
+
+View Definition created under Reference_SF dataset named VW_SF_Teams
+
+
+
+SELECT
+  Name AS DFPTeamName,
+  DFP_TeamId AS DFPTeamID,
+  Account_Name__c AS AccountName,
+  Team_Name__c AS TeamName,
+  Team_Id__c AS TeamId
+FROM
+  `adoperationsprd3.Reference_SF.DFP_Team`
