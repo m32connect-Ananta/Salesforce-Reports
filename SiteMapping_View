@@ -1,0 +1,162 @@
+Salesforce Report replacement for SiteMapping - https://m32media.my.salesforce.com/00O2M000008kt7M
+
+View Definition created under Reference_SF dataset named VW_Site_Mapping_AP
+
+SELECT
+  site.Site_Name_SF AS Site_Name_SF,
+  site.Impression_Source__c AS Impression_Source,
+  site.Site_Active AS Site_Active,
+  sitealias.Name AS Site_Alias_Name_SF,
+  sitealias.Active__c AS Alias_Active,
+  sitealias.Platform__c AS Platform,
+  account.Display_Revenue_Model__c AS Display_Revenue_Model,
+  account.CurrencyIsoCode AS Minimum_Display_CPM_Currency,
+  account.Minimum_Display_CPM__c AS Minimum_Display_CPM,
+  account.Display_Rev_Share__c AS Display_Rev_Share,
+  sitealias.LevelOne__c AS Level_One,
+  account.APNX_ID_2437__c AS APNX_Publisher_ID,
+  sitealias.ID1__c AS ID1,
+  sitealias.ID2__c AS ID2,
+  account.Associated_BU__c AS Associated_BU,
+  account.Partnership_Type__c AS Partnership_Type,
+  account.AccountId AS Account_ID_SF,
+  account.Parent_Account__c AS Parent_Account,
+  account.AccountName AS Account_Name,
+  account.Account_Status__c AS Account_Status,
+  account.M32_Account_Manager__c AS Account_Manager_Name,
+  account.Portal_Type__c AS Portal_Type,
+  site.SiteId AS Site_ID_SF,
+  site.Site_Property_Name AS Site_Property_Name,
+  site.CX_Child_Site_Group_ID__c AS Child_Site_Group_ID_CX,
+  site.CX_Child_Site_Group_Name__c AS Child_Site_Group_Name_CX,
+  site.CX_Parent_Site_Group_ID__c AS Parent_Site_Group_ID_CX,
+  site.CX_Parent_Site_Group_Name__c AS Parent_Site_Group_Name_CX,
+  site.CX_Site_ID__c AS Site_ID_CX,
+  site.CX_SIte_Name__c AS Site_Name_CX,
+  site.CX_SIte_URL__c AS SIte_URL_CX,
+  site.Rating__c AS Rating,
+  site.Domains__c AS Domains,
+  sitealias.SiteAliasId AS Site_Alias_ID_SF,
+  sitealias.Name AS Alias_Name,
+  sitealias.Passback__c AS Passback,
+  sitealias.Source__c AS `Source`,
+  --because Source is a reserved word
+  account.BQ_Dataset_Name__c AS BQ_Dataset_Name,
+  site.Lazy_Load__c as Lazy_Load,
+  account.DFP_ID__c AS DFP_ID,
+  site.Primary_Channel__c AS Primary_Channel,
+  site.Secondary_Channel__c AS Secondary_Channel,
+  site.Categories__c AS Categories,
+  site.Sizes__c AS Sizes,
+  site.Others_sizes__c AS Others_sizes,
+  site.Language__c AS `Language`,
+  -- also a reserved word
+  site.Site_Status__c AS Site_Status,
+  site.Mobile_In_App__c AS Mobile_In_App,
+  site.Mobile_Sizes__c AS Mobile_Sizes,
+  site.Video_Sizes__c AS Video_Sizes,
+  site.Domain_Redirect__c AS Domain_Redirect,
+  account.Mobile_Revenue_Model__c as Mobile_Revenue_Model, 
+  account.Mobile_Rev_Share__c as Mobile_Rev_Share,
+  account.Video_Revenue_Model__c as Video_Revenue_Model, 
+  account.Video_Rev_Share__c as Video_Rev_Share, 
+  account.CurrencyIsoCode  as Minimum_Video_CPM_Currency, 
+  account.Minimum_Video_CPM__c as Minimum_Video_CPM,  
+  site.Base_Domain__c AS Base_Domain,
+  site.Platforms__c AS Platforms,
+  site.AMP_Available__c AS AMP_available,
+  site.Deployed_Script__c AS Deployed_Script,
+  site.DFP_Currency__c AS DFP_Currency,
+  site.HB_Bid_Granularity__c AS HB_Bid_Granularity,
+  account.Short_Code__c AS Short_Code
+FROM (
+  SELECT
+    AccountId,
+    Name AS AccountName,
+    Display_Revenue_Model__c,
+    CurrencyIsoCode,
+    --is this the right currency field?
+    Minimum_Display_CPM__c,
+    Display_Rev_Share__c,
+    APNX_ID_2437__c,
+    APNX_ID__c,
+    Associated_BU__c,
+    Partnership_Type__c,
+    Account_Status__c,
+    M32_Account_Manager__c,
+    Portal_Type__c,
+    BQ_Dataset_Name__c,
+    CAST(DFP_ID__c as INT64) as DFP_ID__c,
+    Mobile_Revenue_Model__c,
+    Mobile_Rev_Share__c,
+    Video_Revenue_Model__c,
+    Video_Rev_Share__c,
+    Minimum_Video_CPM__c,
+    Parent_Account__c,
+    Short_Code__c
+  FROM
+    `adoperationsprd3.Reference_SF.Account`
+  WHERE
+    Account_Status__c IN ('Active',
+      'Inactive, but reporting active' ) ) AS account
+JOIN (
+  SELECT
+    SiteId,
+    Name AS Site_Name_SF,
+    Impression_Source__c,
+    Active__c AS Site_Active,
+    Name__c AS Site_Property_Name,
+    --for backward compatability in case we are referencing by position instead of name
+    CX_Child_Site_Group_ID__c,
+    CX_Child_Site_Group_Name__c,
+    CX_Parent_Site_Group_ID__c,
+    CX_Parent_Site_Group_Name__c,
+    CX_SIte_Name__c,
+    CX_SIte_URL__c,
+    CX_Site_ID__c,
+    Rating__c,
+    Domains__c,
+    Lazy_Load__c,
+    Primary_Channel__c,
+    Secondary_Channel__c,
+    Categories__c,
+    Sizes__c,
+    Others_sizes__c,
+    Language__c,
+    Site_Status__c,
+    Mobile_In_App__c,
+    Mobile_Sizes__c,
+    Video_Sizes__c,
+    Domain_Redirect__c,
+    Base_Domain__c,
+    Platforms__c,
+    Associated_Publishers__c,
+    AMP_Available__c,
+    DFP_Currency__c,
+    HB_Bid_Granularity__c,
+    Deployed_Script__c
+  FROM
+    `adoperationsprd3.Reference_SF.Site`
+  WHERE
+    Active__c = TRUE ) AS site
+ON
+  account.AccountId = site.Associated_Publishers__c
+JOIN (
+  SELECT
+    Name,
+    Active__c,
+    Platform__c,
+    LevelOne__c,
+    ID1__c,
+    ID2__c,
+    SiteAliasId,
+    Name__c AS NameCustomSiteAlias,
+    Passback__c,
+    Source__c,
+    Associated_Site__c
+  FROM
+    `adoperationsprd3.Reference_SF.SiteAlias`
+  WHERE
+    Active__c = TRUE ) AS sitealias
+ON
+  site.SiteId = sitealias.Associated_Site__c
