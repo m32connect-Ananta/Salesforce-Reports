@@ -1,0 +1,14 @@
+Salesforce Report replacement for AdvertiserTypeMapping - https://m32media.my.salesforce.com/00O41000007vrcs
+
+View Definition created under Reference_SF dataset named VW_AdvertiserTypeMapping
+
+
+SELECT
+  Name AS AdvertiserTypeSFName,
+  Advertiser_ID__c AS AdvertiserId,
+  Advertiser_Name__c AS AdvertiserName,
+  DFP_ID__c AS DFPId,
+  DFP_Name__c AS DFPName,
+  Type__c AS M32Type
+FROM
+  `adoperationsprd3.Reference_SF.Adv_Type`
