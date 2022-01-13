@@ -1,0 +1,19 @@
+Salesforce Report replacement for OrderTypeMap - https://m32media.my.salesforce.com/00O2M000008zNR5
+
+View Definition created under Reference_SF dataset named VW_OrderTypeMap
+
+
+SELECT
+  Name AS OrderTypeMap__OrderTypeMap_Name ,
+  Advertiser_ID__c AS Advertiser_ID,
+  Advertiser_Name__c AS Advertiser_Name,
+  DFP_ID__c AS DFP_ID,
+  DFP_Name__c AS DFP_Name,
+  Order_ID__c AS Order_ID,
+  Order_Name__c AS Order_Name,
+  Type__c AS Type,
+  Platform__c AS Platform,
+  Publisher_s_Account__c AS Publisher_s_Account,
+  dataset__c AS Dataset
+FROM
+  `adoperationsprd3.Reference_SF.OrderTypeMap`
