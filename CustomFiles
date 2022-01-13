@@ -1,0 +1,77 @@
+Salesforce Report replacement for HB Placements V2 (custom files) - https://m32media.my.salesforce.com/00O2M000008YEUt
+
+View Definition created under Reference_SF dataset named VW_CustomFiles_AP (Please note the name will be changed in near future)
+
+
+SELECT
+  Site.AccountStatus AS Account_Status,
+  Site.SiteName AS Site_Name,
+  True AS Site_Reporting_Active,
+  Site_Property_Name,
+  Main_Domain,
+  HBplacement.Name AS HB_Placement_Name,
+  HBplacement.Platform__c AS Platform,
+  HBplacement.Size__c AS Size,
+  HBplacement.Placement_ID__c AS Placement_ID,
+  HBplacement.Owner__c AS Platform_Owner,
+  HBplacement.JSON__c AS JSON,
+  HBplacement.LastModifiedDate AS Last_HB_Placement,--Please confirm is this correct
+  Base_Domain,
+  HBplacement.CurrencyIsoCode AS DFP_Currency,--Please confirm the field
+  HBplacement.schain__c AS schain,
+  Site.Wrapper as Wrapper,
+  Site.PrebidWrapper as PrebidWrapper,
+  Site.OpenWrapProfileId as OpenWrapProfileId
+FROM (  
+  
+    SELECT
+    Name,
+    Platform__c,
+    Site__c,
+    Size__c,
+    Status__c,
+    Device__c,
+    Placement_ID__c,
+    Owner__c,
+    JSON__c,
+    schain__c,
+    CurrencyIsoCode,
+    LastModifiedDate,
+    SystemModstamp,
+    Placement_Name__c,
+    Second_Placement_ID__c,
+    Group_ID__c
+  FROM
+    `adoperationsprd3.Reference_SF.HB_Placement`
+  WHERE
+    (Status__c = 'Approved')
+    AND (Device__c <> 'AMP'
+      OR Device__c IS NULL) ) AS HBplacement
+
+JOIN ( 
+
+  SELECT
+    SiteId,
+    Name as SiteName, 
+    Associated_Publishers__c,
+    Name__c as Site_Property_Name,
+    Site_Status__c AS AccountStatus,
+    Domains__c as Main_Domain,
+    Base_Domain__c as Base_Domain,
+    Wrapper__c as Wrapper,
+    Prebid_Wrapper__c as PrebidWrapper,
+    OpenWrap_Profile_Id__c as OpenWrapProfileId
+  FROM
+    `adoperationsprd3.Reference_SF.Site`
+  WHERE
+     
+    Site_Status__c = 'Active'
+    AND Associated_Publishers__c IN (
+    SELECT
+      AccountId
+    FROM
+      `adoperationsprd3.Reference_SF.Account`
+    WHERE
+      Account_Status__c ='Active' ) ) AS Site
+ON
+  HBplacement.Site__c = Site.SiteId
